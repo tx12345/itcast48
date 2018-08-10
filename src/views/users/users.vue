@@ -16,7 +16,7 @@
                 <el-button slot="append" icon="el-icon-search"></el-button>
               </el-input>
               <!-- 添加按钮 -->
-              <el-button type="success" plain>添加</el-button>
+              <el-button @click="handleAdd" type="success" plain>添加</el-button>
             </div>
           </div>
         </el-col>
@@ -67,6 +67,7 @@
         </el-table-column>
         <!-- 分页 -->
       </el-table>
+      <!-- 分页 -->
       <el-pagination
         @size-change="handleSizeChange"
         @current-change="handleCurrentChange"
@@ -77,6 +78,26 @@
         layout="total, sizes, prev, pager, next, jumper"
         :total="count">
       </el-pagination>
+      <el-dialog title="添加用户" :visible.sync="addUserdialogFormVisible">
+        <el-form :model="form" label-width="80px">
+          <el-form-item label="用户名">
+            <el-input v-model="form.name" auto-complete="off"></el-input>
+          </el-form-item>
+          <el-form-item label="密码" type="password">
+            <el-input v-model="form.name" auto-complete="off"></el-input>
+          </el-form-item>
+          <el-form-item label="邮箱">
+            <el-input v-model="form.name" auto-complete="off"></el-input>
+          </el-form-item>
+          <el-form-item label="电话">
+            <el-input v-model="form.name" auto-complete="off"></el-input>
+          </el-form-item>
+        </el-form>
+        <div slot="footer" class="dialog-footer">
+          <el-button @click="addUserdialogFormVisible = false">取 消</el-button>
+          <el-button type="primary" @click="addUserdialogFormVisible = false">确 定</el-button>
+        </div>
+      </el-dialog>
     </el-card>
 </template>
 <script>
@@ -91,7 +112,16 @@
         pagenum : 1,
         // 每页显示多少条数据
         pagesize : 2,
-        count : 0
+        count : 0,
+        // dialog表单
+        form : {
+          email : '',
+          mobile : '',
+          username : '',
+          password : ''
+        },
+        // 控制添加用户的对话框的显示隐藏
+        addUserdialogFormVisible : false,
       }
     },
     created () {
@@ -119,20 +149,22 @@
                 }
             })
       },
+      handleAdd () {
+        this.addUserdialogFormVisible = true;
+      },
       handleDelete () {
       },
       // 每页条数发生变化
       handleSizeChange (val) {
         console.log(val);
         this.pagesize = val;
-        this.loadData()
+        this.loadData();
       },
       // 页码发生变化
       handleCurrentChange (val) {
         console.log(val)
         this.pagenum = val;
-        this.loadData()
-
+        this.loadData();
       }
     }
   }
