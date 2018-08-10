@@ -65,8 +65,18 @@
             <el-button type="success" icon="el-icon-check" circle plain></el-button>
           </template>
         </el-table-column>
-
+        <!-- 分页 -->
       </el-table>
+      <el-pagination
+        @size-change="handleSizeChange"
+        @current-change="handleCurrentChange"
+        :current-page="pagenum"
+        :page-sizes="[2, 4, 6, 8]"
+        :page-size="pagesize"
+        :pager-count="9"
+        layout="total, sizes, prev, pager, next, jumper"
+        :total="count">
+      </el-pagination>
     </el-card>
 </template>
 <script>
@@ -76,31 +86,54 @@
       return {
         tableData : [
         // 发送请求展示用户列表数据
-        ]
+        ],
+        // 页码
+        pagenum : 1,
+        // 每页显示多少条数据
+        pagesize : 2,
+        count : 0
       }
     },
     created () {
       // 渲染用户列表
-      var token = sessionStorage.getItem('token');
-      // 发送请求时，在请求头中携带token，查axios官网设置
-      axios.defaults.headers.common['Authorization'] = token;
-      axios.get('http://localhost:8888/api/private/v1/users?pagenum=1&pagesize=9')
-            .then((response)=>{
-              console.log(response)
-              var { meta : { status, msg } ,data : { users } } = response.data;
-              console.log(users)
-              if(status === 200){
-                this.tableData = users
-              }else{
-                this.$message.error(msg);
-              }
-            })
+      this.loadData()
+
     },
     methods : {
-      handleDelete () {
-
+      loadData () {
+        var token = sessionStorage.getItem('token');
+        // 发送请求时，在请求头中携带token，查axios官网设置
+        axios.defaults.headers.common['Authorization'] = token;
+        // axios.get('http://localhost:8888/api/private/v1/users?pagenum=1&pagesize=9')
+        // axios.get('users?pagenum=1&pagesize=9')
+        axios.get(`users?pagenum=${ this.pagenum }&pagesize=${ this.pagesize }`)
+              .then((response)=>{
+                console.log(response)
+                var { meta : { status, msg } ,data : { users, total } } = response.data;
+                console.log(users)
+                if(status === 200){
+                  this.tableData = users;
+                  this.count = total;
+                }else{
+                  this.$message.error(msg);
+                }
+            })
       },
+      handleDelete () {
+      },
+      // 每页条数发生变化
+      handleSizeChange (val) {
+        console.log(val);
+        this.pagesize = val;
+        this.loadData()
+      },
+      // 页码发生变化
+      handleCurrentChange (val) {
+        console.log(val)
+        this.pagenum = val;
+        this.loadData()
 
+      }
     }
   }
 </script>
