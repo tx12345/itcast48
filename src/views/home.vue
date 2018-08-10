@@ -5,7 +5,7 @@
         <el-row>
           <el-col :span="4"><img src="@/assets/logo.png"></el-col>
           <el-col :span="18"><h2>电商后台管理系统</h2></el-col>
-          <el-col :span="2"><a href="#" class="logout">退出</a></el-col>
+          <el-col :span="2"><a href="#" class="logout" @click="handleLogout">退出</a></el-col>
         </el-row>
       </el-header>
       <el-container>
@@ -43,7 +43,28 @@
     </el-container>
 </template>
 <script type="text/javascript">
+  export default {
+    // 判断用户是否登录是否携带token
+    beforeCreate () {
+      var token = sessionStorage.getItem('token');
+      if(!token) {
+        // 不带token，提示，跳转登录页
+        this.$message.warning('请先登录');
+        this.$router.push('/login')
+      }
+    },
+    methods : {
+      handleLogout () {
+        // 点击退出按钮 清除sessionStorage 跳转到登录页
+        this.$message.success('退出成功');
+        sessionStorage.clear();
+        setTimeout(()=>{
+          this.$router.push('/login');
+        },1000)
 
+      }
+    }
+  }
 </script>
 <style scoped>
   .homeContainer {
