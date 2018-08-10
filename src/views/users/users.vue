@@ -24,8 +24,11 @@
       <!-- 表格部分 -->
       <el-table
         :data="tableData"
-        border
-        style="width: 100%">
+        border>
+        <el-table-column
+          type="index"
+          width="60">
+        </el-table-column>
         <el-table-column
           prop="username"
           label="姓名"
@@ -38,20 +41,31 @@
         </el-table-column>
         <el-table-column
           prop="mobile"
+          width="180"
           label="电话">
         </el-table-column>
         <el-table-column
           prop="create_time"
+          width="180"
           label="时间">
         </el-table-column>
         <el-table-column
           prop="mg_state"
+          width="150"
           label="用户状态">
+          <template slot-scope="scope">
+            <el-switch  active-color="#13ce66" inactive-color="#ff4949"></el-switch>
+          </template>
         </el-table-column>
         <el-table-column
-          prop="address"
           label="操作">
+          <template slot-scope="scope">
+            <el-button type="primary" icon="el-icon-edit" circle plain></el-button>
+            <el-button @click="handleDelete" type="danger" icon="el-icon-delete" circle plain></el-button>
+            <el-button type="success" icon="el-icon-check" circle plain></el-button>
+          </template>
         </el-table-column>
+
       </el-table>
     </el-card>
 </template>
@@ -81,6 +95,12 @@
                 this.$message.error(msg);
               }
             })
+    },
+    methods : {
+      handleDelete () {
+
+      },
+
     }
   }
 </script>
