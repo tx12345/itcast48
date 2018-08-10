@@ -66,6 +66,7 @@
       }
     },
     created () {
+      // 渲染用户列表
       var token = sessionStorage.getItem('token');
       // 发送请求时，在请求头中携带token，查axios官网设置
       axios.defaults.headers.common['Authorization'] = token;
@@ -76,6 +77,8 @@
               console.log(users)
               if(status === 200){
                 this.tableData = users
+              }else{
+                this.$message.error(msg);
               }
             })
     }
