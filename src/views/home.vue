@@ -12,10 +12,10 @@
         <!-- Aside -->
         <el-aside class="homeAside" width="200px">
           <!-- default-openeds 默认展开导航项 -->
-          <el-menu :default-openeds="['1']">
+          <el-menu :default-openeds="['1']" default-active="1-1">
             <el-submenu index="1">
               <template slot="title"><i class="el-icon-location-outline"></i>用户管理</template>
-                <el-menu-item index="1-1">用户列表</el-menu-item>
+                <el-menu-item index="1-1"><i class="el-icon-menu"></i>用户列表</el-menu-item>
             </el-submenu>
             <el-submenu index="2">
               <template slot="title"><i class="el-icon-menu"></i>权限管理</template>
@@ -38,7 +38,10 @@
             </el-submenu>
           </el-menu>
         </el-aside>
-        <el-main class="homeMain">Main</el-main>
+        <el-main class="homeMain">
+          <!-- Main -->
+          <router-view></router-view>
+        </el-main>
       </el-container>
     </el-container>
 </template>
@@ -87,7 +90,7 @@
   }
   .homeHeader h2 {
     text-align: center;
-    font-weight: 400;
+    color: #fff;
   }
   .homeHeader a {
     text-align: right;
