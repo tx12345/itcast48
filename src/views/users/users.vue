@@ -61,7 +61,7 @@
         <el-table-column
           label="操作">
           <template slot-scope="scope">
-            <el-button type="primary" icon="el-icon-edit" circle plain></el-button>
+            <el-button @click="handleEdit" type="primary" icon="el-icon-edit" circle plain></el-button>
             <el-button @click="handleDelete" type="danger" icon="el-icon-delete" circle plain></el-button>
             <el-button type="success" icon="el-icon-check" circle plain></el-button>
           </template>
@@ -80,7 +80,7 @@
         :total="count">
       </el-pagination>
       <!-- 添加用户对话框 -->
-      <el-dialog title="添加用户" :visible.sync="addUserdialogFormVisible">
+      <el-dialog title="添加用户" @close="addCansoleForm('ruleForm')" :visible.sync="addUserdialogFormVisible">
         <el-form :model="form" :rules="rules" ref="ruleForm" label-width="80px">
           <el-form-item label="用户名" prop="username">
             <el-input v-model="form.username" auto-complete="off"></el-input>
@@ -96,8 +96,26 @@
           </el-form-item>
         </el-form>
         <div slot="footer" class="dialog-footer">
-          <el-button @click="addUserdialogFormVisible = false">取 消</el-button>
-          <el-button type="primary" @click="submitForm('ruleForm')">确 定</el-button>
+          <el-button @click="addCansoleForm('ruleForm')">取 消</el-button>
+          <el-button type="primary" @click="addSureForm('ruleForm')">确 定</el-button>
+        </div>
+      </el-dialog>
+      <!-- 编辑用户对话框 -->
+      <el-dialog title="编辑用户" :visible.sync="editUserdialogFormVisible">
+        <el-form :model="form" :rules="rules" ref="editForm" label-width="80px">
+          <el-form-item label="用户名">
+            <el-input v-model="form.username" auto-complete="off" disabled></el-input>
+          </el-form-item>
+          <el-form-item label="邮箱">
+            <el-input v-model="form.email" auto-complete="off"></el-input>
+          </el-form-item>
+          <el-form-item label="电话">
+            <el-input v-model="form.mobile" auto-complete="off"></el-input>
+          </el-form-item>
+        </el-form>
+        <div slot="footer" class="dialog-footer">
+          <el-button @click="editUserdialogFormVisible = false">取 消</el-button>
+          <el-button type="primary" @click="EditSureForm('editForm')">确 定</el-button>
         </div>
       </el-dialog>
     </el-card>
@@ -116,8 +134,9 @@
         pagesize : 2,
         count : 0,
         searchKey : '',
-        // 控制添加用户的对话框的显示隐藏
+        // 控制添加用户的对话框的显示隐藏,控编辑加用户的对话框的显示隐藏
         addUserdialogFormVisible : false,
+        editUserdialogFormVisible : false,
         // 添加用户dialog表单
         form : {
           email : '',
@@ -135,7 +154,6 @@
             { required: true, message: '请输入密码', trigger: 'blur' },
             { min: 3, max: 12, message: '长度在 3 到 12 个字符', trigger: 'blur' }
           ]
-
         }
       }
     },
@@ -166,6 +184,7 @@
                 }
             })
       },
+      //搜索用户
       handleSearch () {
         // console.log(this.searchKey)
         // 发送请求，由于搜索功能的发送请求的地址与加载用户页面是一个借口，再拼接查询的关键字就可以，直接在加载用户页面修改并不会有影响
@@ -177,7 +196,7 @@
         this.addUserdialogFormVisible = true;
       },
       // 点击添加对话框确定按钮
-      async submitForm (ruleForm) {
+      async addSureForm (ruleForm) {
         // 获取表单数据
         var formData = this.form;
         //表单数据验证
@@ -204,6 +223,23 @@
             return false;
           }
         })
+      },
+      // 点击添加对话框取消按钮
+      addCansoleForm (ruleForm) {
+        // 关闭对话框
+        this.addUserdialogFormVisible = false;
+        // 清除表单数据
+        for(var key in this.form){
+          this.form[key] = '';
+        }
+      },
+      // 编辑用户
+      handleEdit (editForm) {
+        this.editUserdialogFormVisible = true;
+
+      },
+      async EditSureForm (editForm) {
+
       },
       handleDelete () {
 
