@@ -63,7 +63,7 @@
           <template slot-scope="scope">
             <!-- scope.row 查element-ui table表格获取当前操作对象 -->
             <el-button @click="handleEdit(scope.row)" type="primary" icon="el-icon-edit" circle plain></el-button>
-            <el-button @click="handleDelete" type="danger" icon="el-icon-delete" circle plain></el-button>
+            <el-button @click="handleDelete(scope.row)" type="danger" icon="el-icon-delete" circle plain></el-button>
             <el-button type="success" icon="el-icon-check" circle plain></el-button>
           </template>
         </el-table-column>
@@ -175,11 +175,10 @@
         axios.get(`users?pagenum=${ this.pagenum }&pagesize=${ this.pagesize }&query=${ this.searchKey }`)
               .then((response)=>{
                 console.log(response)
-                var { meta : { status, msg } ,data : { users, total } } = response.data;
-                console.log(users)
+                var { meta : { status, msg } } = response.data;
                 if(status === 200){
-                  this.tableData = users;
-                  this.count = total;
+                  this.tableData = response.data.data.users;
+                  this.count = response.data.data.total;
                 }else{
                   this.$message.error(msg);
                 }
@@ -260,8 +259,21 @@
         }
         }
       },
-      handleDelete () {
-
+      async handleDelete (users) {
+        var id = users.id
+        this.$confirm('确定删除吗?', '提示', {
+        confirmButtonText: '确定',
+        cancelButtonText: '取消',
+        type: 'warning'
+        }).then(async () => {
+            const response = await this.$http.delete(`users/${id}`)
+            console.log(response)
+            const { meta : {status, msg } } = response.data;
+            if(status === 200){
+              this.$message.success(msg);
+              this.loadData()
+            }
+        })
       },
       // 每页条数发生变化
       handleSizeChange (val) {
