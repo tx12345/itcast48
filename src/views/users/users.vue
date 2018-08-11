@@ -55,7 +55,7 @@
           width="150"
           label="用户状态">
           <template slot-scope="scope">
-            <el-switch  active-color="#13ce66" inactive-color="#ff4949"></el-switch>
+            <el-switch @change="handleChangStatus(scope.row)" v-model="scope.row.mg_state" active-color="#13ce66" inactive-color="#ff4949"></el-switch>
           </template>
         </el-table-column>
         <el-table-column
@@ -258,6 +258,18 @@
           this.form[key] = '';
         }
       },
+      //点击修改用户状态按钮
+      async handleChangStatus (users) {
+        // 发送请求
+        const response = await this.$http.put(`users/${users.id}/state/${users.mg_state}`)
+        console.log(response)
+        const { meta : {status, msg}} = response.data;
+        if(status === 200){
+          this.$message.success(msg);
+        }else{
+          this.$message.error(msg);
+        }
+      },
       // 编辑用户
       handleEdit (users) {
         this.editUserdialogFormVisible = true;
@@ -314,7 +326,6 @@
         console.log(response);
         // 显示角色选择列表（下拉框）
         this.form.roles = response.data.data;
-
       },
       // 点击角色管理对话框确认按钮
       async setRolesSureForm () {
