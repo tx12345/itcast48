@@ -1,6 +1,7 @@
 <template>
-    <!-- 面包屑 -->
+    <!-- element-ui card -->
     <el-card class="box-card">
+      <!-- 面包屑 -->
       <el-breadcrumb separator-class="el-icon-arrow-right">
         <el-breadcrumb-item :to="{ path: '/' }">首页</el-breadcrumb-item>
         <el-breadcrumb-item>用户管理</el-breadcrumb-item>
@@ -12,8 +13,8 @@
           <div class="grid-content bg-purple">
             <!-- 搜索框 -->
             <div style="margin-top: 15px;">
-              <el-input placeholder="请输入内容" class="input-with-select" style="width: 300px">
-                <el-button slot="append" icon="el-icon-search"></el-button>
+              <el-input v-model="searchKey" placeholder="请输入内容" class="input-with-select" style="width: 300px">
+                <el-button @click="handleSearch" slot="append" icon="el-icon-search"></el-button>
               </el-input>
               <!-- 添加按钮 -->
               <el-button @click="handleAdd" type="success" plain>添加</el-button>
@@ -114,6 +115,7 @@
         // 每页显示多少条数据
         pagesize : 2,
         count : 0,
+        searchKey : '',
         // 控制添加用户的对话框的显示隐藏
         addUserdialogFormVisible : false,
         // 添加用户dialog表单
@@ -143,13 +145,15 @@
 
     },
     methods : {
+      // 加载页面
       loadData () {
         var token = sessionStorage.getItem('token');
         // 发送请求时，在请求头中携带token，查axios官网设置
         axios.defaults.headers.common['Authorization'] = token;
         // axios.get('http://localhost:8888/api/private/v1/users?pagenum=1&pagesize=9')
         // axios.get('users?pagenum=1&pagesize=9')
-        axios.get(`users?pagenum=${ this.pagenum }&pagesize=${ this.pagesize }`)
+        // axios.get(`users?pagenum=${ this.pagenum }&pagesize=${ this.pagesize }`)
+        axios.get(`users?pagenum=${ this.pagenum }&pagesize=${ this.pagesize }&query=${ this.searchKey }`)
               .then((response)=>{
                 console.log(response)
                 var { meta : { status, msg } ,data : { users, total } } = response.data;
@@ -162,15 +166,21 @@
                 }
             })
       },
+      handleSearch () {
+        // console.log(this.searchKey)
+        // 发送请求，由于搜索功能的发送请求的地址与加载用户页面是一个借口，再拼接查询的关键字就可以，直接在加载用户页面修改并不会有影响
+        this.loadData()
+      },
       // 添加用户
       handleAdd () {
         // 点击添加按钮，添加用户对话框显示
         this.addUserdialogFormVisible = true;
       },
-
-     async submitForm (ruleForm) {
+      // 点击添加对话框确定按钮
+      async submitForm (ruleForm) {
         // 获取表单数据
         var formData = this.form;
+        //表单数据验证
         this.$refs[ruleForm].validate( async (valid) => {
           console.log(ruleForm)
           if (valid) {
@@ -196,6 +206,7 @@
         })
       },
       handleDelete () {
+
       },
       // 每页条数发生变化
       handleSizeChange (val) {
