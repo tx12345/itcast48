@@ -61,7 +61,8 @@
         <el-table-column
           label="操作">
           <template slot-scope="scope">
-            <el-button @click="handleEdit" type="primary" icon="el-icon-edit" circle plain></el-button>
+            <!-- scope.row 查element-ui table表格获取当前操作对象 -->
+            <el-button @click="handleEdit(scope.row)" type="primary" icon="el-icon-edit" circle plain></el-button>
             <el-button @click="handleDelete" type="danger" icon="el-icon-delete" circle plain></el-button>
             <el-button type="success" icon="el-icon-check" circle plain></el-button>
           </template>
@@ -234,12 +235,30 @@
         }
       },
       // 编辑用户
-      handleEdit (editForm) {
+      handleEdit (users) {
         this.editUserdialogFormVisible = true;
-
+        console.log(users);
+        // 点击编辑按钮渲染数据
+        this.form.username = users.username;
+        this.form.email = users.email;
+        this.form.mobile = users.mobile;
+        // 记录当前用户id（发送请求需要id）
+        this.form.id = users.id
       },
-      async EditSureForm (editForm) {
-
+      // 点击编辑对话框确认按钮
+      async EditSureForm () {
+        // 根据修改的内容发送请求修改数据
+        const response = await this.$http.put(`users/${this.form.id}`,{ email : this.form.email, mobile : this.form.mobile})
+        console.log(response);
+        const { meta : { status, msg} } = response.data;
+        if(status === 200){
+          this.$message.success(msg);
+          this.loadData();
+          this.editUserdialogFormVisible = false;
+          for(var key in this.form){
+          this.form[key] = '';
+        }
+        }
       },
       handleDelete () {
 
