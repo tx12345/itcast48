@@ -11,9 +11,9 @@
       <el-container>
         <!-- Aside -->
         <el-aside class="homeAside" width="200px">
-          <!-- default-openeds 默认展开导航项 -->
-          <el-menu :default-openeds="['1']" default-active="1-1">
-            <el-submenu index="1">
+          <!-- default-openeds 默认展开导航项  -->
+          <el-menu :default-openeds="[]">
+            <el-submenu index="1" default-active="1-1">
               <template slot="title"><i class="el-icon-location-outline"></i>用户管理</template>
                 <el-menu-item index="1-1"><i class="el-icon-menu"></i>用户列表</el-menu-item>
             </el-submenu>
