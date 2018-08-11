@@ -64,7 +64,7 @@
             <!-- scope.row 查element-ui table表格获取当前操作对象 -->
             <el-button @click="handleEdit(scope.row)" type="primary" icon="el-icon-edit" circle plain></el-button>
             <el-button @click="handleDelete(scope.row)" type="danger" icon="el-icon-delete" circle plain></el-button>
-            <el-button type="success" icon="el-icon-check" circle plain></el-button>
+            <el-button @click="handleSetRoles(scope.row)" type="success" icon="el-icon-check" circle plain></el-button>
           </template>
         </el-table-column>
         <!-- 分页 -->
@@ -119,6 +119,26 @@
           <el-button type="primary" @click="EditSureForm('editForm')">确 定</el-button>
         </div>
       </el-dialog>
+      <!-- 分配角色对话框 -->
+      <el-dialog title="角色管理" :visible.sync="setRolesdialogFormVisible">
+        <el-form :model="form" :rules="rules" ref="setRolesForm" label-width="80px">
+          <el-form-item label="用户名">
+            {{ form.currentName }}
+          </el-form-item>
+          <el-form-item label="选择角色">
+            <el-select v-model="form.currentRoleId">
+              <el-option label="请选择" value="-1" disabled></el-option>
+              <el-option v-for="item in form.roles" :key="item.id" :label="item.roleName" :value="item.id">
+                <!-- 循环roles -->
+              </el-option>
+            </el-select>
+          </el-form-item>
+        </el-form>
+        <div slot="footer" class="dialog-footer">
+          <el-button @click="setRolesdialogFormVisible=false">取 消</el-button>
+          <el-button type="primary" @click="setRolesSureForm('setRolesForm')">确 定</el-button>
+        </div>
+      </el-dialog>
     </el-card>
 </template>
 <script>
@@ -135,15 +155,21 @@
         pagesize : 2,
         count : 0,
         searchKey : '',
-        // 控制添加用户的对话框的显示隐藏,控编辑加用户的对话框的显示隐藏
+        // 控制添加用户的对话框的显示隐藏,控编辑加用户的对话框的显示隐藏,控制分配角色的对话框的显示隐藏
         addUserdialogFormVisible : false,
         editUserdialogFormVisible : false,
+        setRolesdialogFormVisible : false,
         // 添加用户dialog表单
         form : {
           email : '',
           mobile : '',
           username : '',
-          password : ''
+          password : '',
+          // 分配角色绑定的下来框
+          currentId : '-1',
+          currentRoleId: '-1',
+          currentName : '',
+          roles : []
         },
         // 添加用户dialog表单验证
         rules: {
@@ -155,13 +181,12 @@
             { required: true, message: '请输入密码', trigger: 'blur' },
             { min: 3, max: 12, message: '长度在 3 到 12 个字符', trigger: 'blur' }
           ]
-        }
+        },
       }
     },
     created () {
       // 渲染用户列表
       this.loadData()
-
     },
     methods : {
       // 加载页面
@@ -259,6 +284,7 @@
         }
         }
       },
+      // 删除用户
       async handleDelete (users) {
         var id = users.id
         this.$confirm('确定删除吗?', '提示', {
@@ -274,6 +300,32 @@
               this.loadData()
             }
         })
+      },
+      // 角色管理
+      async handleSetRoles (users) {
+        // 渲染对话框数据
+        this.setRolesdialogFormVisible = true;
+        console.log(users);
+        this.form.currentName = users.username;
+        this.form.currentUserId = users.id;
+        this.form.currentRolesName = users.role_name
+        // 根据当前用户id查询用户信息
+        const response = await this.$http.get('roles');
+        console.log(response);
+        // 显示角色选择列表（下拉框）
+        this.form.roles = response.data.data;
+
+      },
+      // 点击角色管理对话框确认按钮
+      async setRolesSureForm () {
+        // 修改currentUserId发送请求
+        const response = await this.$http.put(`users/${ this.form.currentUserId }/role`,{rid: this.form.currentRoleId})
+        console.log(response)
+        const { meta : { status, msg}} = response.data;
+        if(status === 200){
+          this.$message.success(msg);
+          this.setRolesdialogFormVisible = false;
+        }
       },
       // 每页条数发生变化
       handleSizeChange (val) {
