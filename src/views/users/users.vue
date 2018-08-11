@@ -78,24 +78,25 @@
         layout="total, sizes, prev, pager, next, jumper"
         :total="count">
       </el-pagination>
+      <!-- 添加用户对话框 -->
       <el-dialog title="添加用户" :visible.sync="addUserdialogFormVisible">
-        <el-form :model="form" label-width="80px">
-          <el-form-item label="用户名">
-            <el-input v-model="form.name" auto-complete="off"></el-input>
+        <el-form :model="form" :rules="rules" ref="ruleForm" label-width="80px">
+          <el-form-item label="用户名" prop="username">
+            <el-input v-model="form.username" auto-complete="off"></el-input>
           </el-form-item>
-          <el-form-item label="密码" type="password">
-            <el-input v-model="form.name" auto-complete="off"></el-input>
+          <el-form-item label="密码" type="password" prop="password">
+            <el-input v-model="form.password" auto-complete="off"></el-input>
           </el-form-item>
           <el-form-item label="邮箱">
-            <el-input v-model="form.name" auto-complete="off"></el-input>
+            <el-input v-model="form.email" auto-complete="off"></el-input>
           </el-form-item>
           <el-form-item label="电话">
-            <el-input v-model="form.name" auto-complete="off"></el-input>
+            <el-input v-model="form.mobile" auto-complete="off"></el-input>
           </el-form-item>
         </el-form>
         <div slot="footer" class="dialog-footer">
           <el-button @click="addUserdialogFormVisible = false">取 消</el-button>
-          <el-button type="primary" @click="addUserdialogFormVisible = false">确 定</el-button>
+          <el-button type="primary" @click="submitForm('ruleForm')">确 定</el-button>
         </div>
       </el-dialog>
     </el-card>
@@ -113,15 +114,27 @@
         // 每页显示多少条数据
         pagesize : 2,
         count : 0,
-        // dialog表单
+        // 控制添加用户的对话框的显示隐藏
+        addUserdialogFormVisible : false,
+        // 添加用户dialog表单
         form : {
           email : '',
           mobile : '',
           username : '',
           password : ''
         },
-        // 控制添加用户的对话框的显示隐藏
-        addUserdialogFormVisible : false,
+        // 添加用户dialog表单验证
+        rules: {
+          username: [
+            { required: true, message: '请输入用户名', trigger: 'blur' },
+            { min: 3, max: 8, message: '长度在 3 到 8 个字符', trigger: 'blur' }
+          ],
+          password: [
+            { required: true, message: '请输入密码', trigger: 'blur' },
+            { min: 3, max: 12, message: '长度在 3 到 12 个字符', trigger: 'blur' }
+          ]
+
+        }
       }
     },
     created () {
@@ -149,8 +162,38 @@
                 }
             })
       },
+      // 添加用户
       handleAdd () {
+        // 点击添加按钮，添加用户对话框显示
         this.addUserdialogFormVisible = true;
+      },
+
+     async submitForm (ruleForm) {
+        // 获取表单数据
+        var formData = this.form;
+        this.$refs[ruleForm].validate( async (valid) => {
+          console.log(ruleForm)
+          if (valid) {
+            // 发送请求（使用async与await可以不再.then，this.$http在main.js中定义了代替了axios）
+            const response = await this.$http.post('users',formData)
+            console.log(response);
+            var { meta : { status, msg } } = response.data
+            // console.log(status)
+            if( status === 201 ){
+              this.$message.success(msg);
+              // 清空form表单中的内容
+              for(var key in formData){
+                formData[key] = '';
+              }
+              //关闭对话框
+              this.addUserdialogFormVisible = false;
+            }else{
+              this.$message.error(msg)
+            }
+          }else{
+            return false;
+          }
+        })
       },
       handleDelete () {
       },
