@@ -191,9 +191,9 @@
     methods : {
       // 加载页面
       loadData () {
-        var token = sessionStorage.getItem('token');
+        // var token = sessionStorage.getItem('token');
         // 发送请求时，在请求头中携带token，查axios官网设置
-        axios.defaults.headers.common['Authorization'] = token;
+        // axios.defaults.headers.common['Authorization'] = token;
         // axios.get('http://localhost:8888/api/private/v1/users?pagenum=1&pagesize=9')
         // axios.get('users?pagenum=1&pagesize=9')
         // axios.get(`users?pagenum=${ this.pagenum }&pagesize=${ this.pagesize }`)

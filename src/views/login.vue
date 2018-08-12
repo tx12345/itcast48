@@ -43,6 +43,7 @@
                   //存放token到sessionStorage中
                   sessionStorage.setItem('token',token);
                   //跳转到后台首页users
+                  this.$router.push('/login');
                 }else {
                   this.$message.error(msg)
                 }
